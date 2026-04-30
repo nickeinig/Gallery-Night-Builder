@@ -836,7 +836,7 @@
     .poster-card__media {
       position: relative;
       width: 100%;
-      padding-top: 80%; /* 5:4 aspect via padding hack â€” html2canvas-safe */
+      padding-top: 80%; /* 5:4 aspect via padding hack - html2canvas-safe */
       overflow: hidden;
       background: linear-gradient(180deg, rgba(137, 73, 197, 0.09), rgba(78, 39, 81, 0.03));
       border-bottom: 1px solid rgba(78, 39, 81, 0.08);
@@ -1142,15 +1142,15 @@
     .poster-empty h3 {
       margin: 0;
       font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 500;
-      line-height: 1;
-      letter-spacing: -0.03em;
+      line-height: 1.08;
+      letter-spacing: -0.02em;
     }
 
     .poster-empty p {
       margin: 12px auto 0;
-      max-width: 34ch;
+      max-width: 30ch;
       color: var(--ink-soft);
       line-height: 1.6;
     }
@@ -1244,7 +1244,7 @@
     }
 
     /* ================================================== */
-    /* === VAPORWAVE THEME â€” Sunset gradient + grid === */
+    /* === VAPORWAVE THEME - Sunset gradient + grid === */
     /* ================================================== */
 
     .poster-page {
@@ -1379,7 +1379,7 @@
           <p class="section-label">Builder</p>
           <h2 class="section-title">Simple Setup</h2>
           <p class="section-copy">
-            Choose an office, set that officeâ€™s date and location, then add the projects that
+            Choose an office, set that office's date and location, then add the projects that
             belong on the board. The poster reflows automatically for small and large groups.
           </p>
         </div>
@@ -1461,7 +1461,7 @@
         { id: "st-louis", name: "St. Louis", location: "8640 Evans Ave." }
       ];
 
-      // Intern roster â€” from the official 2026 LJC program roster plus local assets/Interns folders
+      // Intern roster - from the official 2026 LJC program roster plus local assets/Interns folders
       var INTERNS = [
         { id: "joey-friedel", name: "Joey Friedel", officeId: "st-louis", discipline: "Structural Engineering", college: "Missouri S&T", headshot: "assets/Interns/Joey Friedel/headshot.webp" },
         { id: "grant-bailey", name: "Grant Bailey", officeId: "st-louis", discipline: "Mechanical Engineering", college: "Missouri S&T", headshot: "assets/Interns/Grant Bailey/headshot.svg" },
@@ -1779,7 +1779,7 @@
         }
 
         refs.projectList.innerHTML = projects.map(function (project, index) {
-          var summary = [project.name, project.discipline].filter(Boolean).join(" Â· ");
+          var summary = [project.name, project.discipline].filter(Boolean).join(" - ");
           var preview = project.heroImage
             ? "<img src=\"" + project.heroImage + "\" alt=\"" + escapeHtml(project.projectTitle || project.name || "Project hero") + "\" />"
             : "<div class=\"upload-placeholder\">Upload the hero image for this project.</div>";
@@ -1793,9 +1793,9 @@
                   "<p>" + escapeHtml(summary || "Add the intern, discipline, and project details below.") + "</p>" +
                 "</div>" +
                 "<div class=\"summary-actions\">" +
-                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"up\" title=\"Move up\">â†‘</button>" +
-                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"down\" title=\"Move down\">â†“</button>" +
-                  "<button class=\"summary-btn danger\" type=\"button\" data-project-action=\"delete\" title=\"Delete\">Ã—</button>" +
+                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"up\" title=\"Move up\">&uarr;</button>" +
+                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"down\" title=\"Move down\">&darr;</button>" +
+                  "<button class=\"summary-btn danger\" type=\"button\" data-project-action=\"delete\" title=\"Delete\">&times;</button>" +
                 "</div>" +
               "</summary>" +
               "<div class=\"project-editor__body\">" +
@@ -1844,7 +1844,7 @@
       function internDropdownTemplate(project) {
         var officeId = state.selectedOfficeId;
         var roster = internsForOffice(officeId);
-        var options = ["<option value=\"\">Select internâ€¦</option>"];
+        var options = ["<option value=\"\">Select intern...</option>"];
         roster.forEach(function (intern) {
           var selected = project.internId === intern.id ? " selected" : "";
           options.push(
@@ -1900,9 +1900,9 @@
               posterHeaderTemplate(office, pageIndex, totalPages, layout.header, totalProjects) +
               "<div class=\"poster-empty\">" +
                 "<div>" +
-                  "<strong>Waiting on content</strong>" +
-                  "<h3>Build " + escapeHtml(officeDisplayName(office)) + " here.</h3>" +
-                  "<p>Add projects in the left column and this poster will update automatically.</p>" +
+                  "<strong>No projects yet</strong>" +
+                  "<h3>Add the first project</h3>" +
+                  "<p>Your " + escapeHtml(officeDisplayName(office)) + " poster preview will appear here automatically.</p>" +
                 "</div>" +
               "</div>" +
             "</section>"
@@ -2218,7 +2218,7 @@
         createCanvasesFromPreview()
           .then(function (canvases) {
             var jsPDF = window.jspdf.jsPDF;
-            var pageW = 11;  // inches â€” tabloid portrait
+            var pageW = 11;  // inches - tabloid portrait
             var pageH = 17;
             var pageRatio = pageW / pageH;
             var pdf = new jsPDF({
@@ -2234,13 +2234,13 @@
               var canvasRatio = canvas.width / canvas.height;
               var imgW, imgH, x, y;
               if (canvasRatio > pageRatio) {
-                // Wider than tabloid â€” fit to page width, center vertically
+                // Wider than tabloid - fit to page width, center vertically
                 imgW = pageW;
                 imgH = pageW / canvasRatio;
                 x = 0;
                 y = (pageH - imgH) / 2;
               } else {
-                // Taller than tabloid â€” fit to page height, center horizontally
+                // Taller than tabloid - fit to page height, center horizontally
                 imgH = pageH;
                 imgW = pageH * canvasRatio;
                 x = (pageW - imgW) / 2;
@@ -2334,7 +2334,7 @@
         if (internSelect) {
           var internProjectId = internSelect.closest("[data-project-id]").dataset.projectId;
           selectInternForProject(internProjectId, internSelect.value);
-          showStatus(internSelect.value ? "Intern selected â€” name, discipline, college, and headshot updated." : "Intern cleared.");
+          showStatus(internSelect.value ? "Intern selected - name, discipline, college, and headshot updated." : "Intern cleared.");
           return;
         }
 
