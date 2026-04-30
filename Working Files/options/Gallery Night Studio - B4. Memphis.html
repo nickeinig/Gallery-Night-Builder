@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LJC Gallery Night Builder</title>
+  <meta
+    name="description"
+    content="A simple office-led builder for creating LJC Gallery Night awareness posters and exporting them as PDF or PNG."
+  />
+  <style>
+    @font-face {
+      font-family: "NeueHaasGrotDispRound";
+      src: url("assets/fonts/NeueHaasGrotDispRound-500.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "NeueHaasGrotTextRound";
+      src: url("assets/fonts/NeueHaasGrotTextRound-400.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "NeueHaasGrotTextRound";
+      src: url("assets/fonts/NeueHaasGrotTextRound-500.woff2") format("woff2");
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "NeueHaasGrotTextRound";
+      src: url("assets/fonts/NeueHaasGrotTextRound-700.woff2") format("woff2");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --ink: #212121;
+      --ink-soft: rgba(33, 33, 33, 0.7);
+      --paper: #ffffff;
+      --paper-soft: #f7f4fa;
+      --paper-tint: #fcf9fe;
+      --line: rgba(78, 39, 81, 0.1);
+      --line-strong: rgba(78, 39, 81, 0.18);
+      --brand: #4e2751;
+      --brand-bright: #8949c5;
+      --brand-soft: rgba(137, 73, 197, 0.1);
+      --accent-warm: #e8dfcc;
+      --accent-warm-soft: #f4ebd9;
+      --accent-deep: #2a3441;
+      --shadow: 0 24px 56px rgba(52, 26, 56, 0.08);
+      --shadow-soft: 0 12px 30px rgba(52, 26, 56, 0.06);
+      --radius: 24px;
+      --radius-sm: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "NeueHaasGrotTextRound", Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #fcfbfd 0%, #f6f2f8 100%);
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 200px;
+      width: min(54vw, 760px);
+      height: min(62vw, 900px);
+      background:
+        linear-gradient(135deg, rgba(137, 73, 197, 0.04), rgba(137, 73, 197, 0));
+      clip-path: polygon(38% 0, 100% 0, 100% 100%, 0 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .masthead {
+      padding: 0 0 28px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+    }
+
+    .masthead__brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 20px;
+    }
+
+    .masthead__brand::after {
+      content: "";
+      width: 88px;
+      height: 1px;
+      background: var(--line-strong);
+    }
+
+    .masthead h1 {
+      margin: 0 0 12px;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4.6rem);
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .masthead p {
+      margin: 0;
+      max-width: 70ch;
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 410px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 18px 42px rgba(52, 26, 56, 0.08);
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--brand) 0%, var(--brand-bright) 100%);
+      z-index: 1;
+    }
+
+    .panel::after {
+      display: none;
+    }
+
+    .controls,
+    .preview {
+      min-width: 0;
+    }
+
+    .panel__section {
+      position: relative;
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      z-index: 1;
+    }
+
+    .panel__section:last-child {
+      border-bottom: 0;
+    }
+
+    .controls .panel__section:first-child,
+    .preview__head {
+      background: linear-gradient(180deg, rgba(137, 73, 197, 0.08), rgba(137, 73, 197, 0.02));
+    }
+
+    .section-label {
+      margin: 0 0 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: 2rem;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .section-copy {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label,
+    .field__label {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.92);
+      padding: 14px 15px;
+      font-size: 1rem;
+      line-height: 1.4;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field textarea {
+      min-height: 104px;
+      resize: vertical;
+    }
+
+    .field input:focus-visible,
+    .field textarea:focus-visible,
+    .field select:focus-visible,
+    .btn:focus-visible,
+    .chip:focus-visible,
+    .mini-btn:focus-visible,
+    .summary-btn:focus-visible,
+    .office-tab:focus-visible {
+      outline: none;
+      border-color: var(--brand-bright);
+      box-shadow: 0 0 0 3px rgba(137, 73, 197, 0.14);
+    }
+
+    .btn-row,
+    .mini-row,
+    .office-tabs,
+    .meta-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn,
+    .mini-btn,
+    .chip,
+    .office-tab,
+    .summary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 16px;
+      border-radius: 999px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: #ffffff;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover,
+    .mini-btn:hover,
+    .chip:hover,
+    .office-tab:hover,
+    .summary-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    .btn.secondary,
+    .mini-btn,
+    .chip,
+    .office-tab,
+    .summary-btn {
+      background: #ffffff;
+      color: var(--ink);
+      border-color: var(--line-strong);
+    }
+
+    .btn.brand {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .office-tab.active,
+    .chip.active {
+      background: var(--brand);
+      color: #ffffff;
+      border-color: var(--brand);
+    }
+
+    .office-tab small,
+    .chip small {
+      margin-left: 8px;
+      font-size: 0.75rem;
+      opacity: 0.76;
+    }
+
+    .note {
+      padding: 18px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(137, 73, 197, 0.06));
+      border: 1px solid var(--line);
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    .note p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    .project-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .project-editor {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .project-editor > summary {
+      list-style: none;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .project-editor > summary:hover {
+      background: rgba(137, 73, 197, 0.04);
+    }
+
+    .project-editor > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .project-number {
+      width: 36px;
+      height: 36px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--brand-soft);
+      color: var(--brand);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .project-summary h4 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .project-summary p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      line-height: 1.45;
+    }
+
+    .project-editor__body {
+      padding: 0 16px 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .summary-btn {
+      min-width: 36px;
+      min-height: 36px;
+      padding: 0 10px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+    }
+
+    .summary-btn.danger {
+      color: #8d3030;
+      border-color: rgba(141, 48, 48, 0.2);
+      background: #ffffff;
+    }
+
+    .upload-preview {
+      aspect-ratio: 16 / 10;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(137, 73, 197, 0.05));
+      display: grid;
+      place-items: center;
+    }
+
+    .upload-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-placeholder {
+      padding: 18px;
+      text-align: center;
+      color: var(--ink-soft);
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+
+    .status {
+      padding: 18px 24px;
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(137, 73, 197, 0.06));
+      border-top: 1px solid var(--line);
+      border-radius: 0 0 var(--radius) var(--radius);
+      z-index: 1;
+    }
+
+    .status__label {
+      margin: 0 0 4px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    .status__message {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--ink-soft);
+    }
+
+    .preview__head {
+      padding: 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .preview__head h2 {
+      margin: 0 0 6px;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: 2rem;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .preview__head p {
+      margin: 0;
+      max-width: 48ch;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    .preview__body {
+      position: relative;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 244, 251, 0.96));
+      overflow: hidden;
+    }
+
+    .preview__body::before {
+      display: none;
+    }
+
+    .preview__body > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .preview-meta .chip {
+      min-height: 36px;
+      padding: 0 12px;
+      font-size: 0.8125rem;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .poster-stack {
+      display: grid;
+      gap: 30px;
+      justify-items: center;
+    }
+
+    .poster-page {
+      position: relative;
+      width: min(100%, 880px);
+      background: linear-gradient(180deg, #ffffff 0%, #fcfbfd 100%);
+      border: 1px solid rgba(78, 39, 81, 0.12);
+      border-radius: 24px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 20px 48px rgba(52, 26, 56, 0.12);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .poster-page::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 8px;
+      background: linear-gradient(90deg, var(--page-accent) 0%, var(--page-accent-alt) 72%, rgba(137, 73, 197, 0.24) 100%);
+      z-index: 0;
+    }
+
+    .poster-page::after {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(137, 73, 197, 0.12) 0%, rgba(137, 73, 197, 0) 72%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .poster-page > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .poster-page--export {
+      width: 1400px !important;
+      box-shadow: none !important;
+    }
+
+    .poster-header {
+      display: grid;
+      gap: 16px;
+      padding: 18px 20px 20px;
+      border: 1px solid rgba(78, 39, 81, 0.1);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(247, 242, 250, 0.95), rgba(255, 255, 255, 0.96));
+    }
+
+    .poster-header--compact {
+      padding: 16px 18px 18px;
+      gap: 14px;
+    }
+
+    .poster-header__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .poster-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    .poster-brand::after {
+      content: "";
+      width: 64px;
+      height: 1px;
+      background: rgba(78, 39, 81, 0.24);
+    }
+
+    .poster-pagecount {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(137, 73, 197, 0.08);
+      color: var(--brand);
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .poster-kicker {
+      margin: 0 0 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    .poster-title {
+      margin: 0;
+      max-width: 8ch;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: clamp(3.35rem, 5.6vw, 5rem);
+      font-weight: 500;
+      line-height: 0.94;
+      letter-spacing: -0.05em;
+      color: var(--brand);
+      text-wrap: balance;
+    }
+
+    .poster-header--compact .poster-title {
+      font-size: clamp(2.2rem, 3.6vw, 3rem);
+      max-width: none;
+    }
+
+    .poster-subtitle {
+      margin: 10px 0 0;
+      max-width: 34ch;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: var(--ink-soft);
+    }
+
+    .poster-meta-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .poster-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid rgba(78, 39, 81, 0.12);
+      color: var(--ink);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .poster-meta-pill--office {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #ffffff;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+      align-items: stretch;
+      align-content: flex-start;
+      grid-auto-flow: row;
+    }
+
+    .project-grid > .poster-card {
+      min-width: 0;
+      grid-column: span 12;
+    }
+
+    .project-grid[data-layout="spotlight"] > .poster-card,
+    .project-grid[data-cols="1"] > .poster-card {
+      grid-column: span 12;
+    }
+
+    .project-grid[data-cols="2"] > .poster-card {
+      grid-column: span 6;
+    }
+
+    .project-grid[data-cols="3"] > .poster-card {
+      grid-column: span 4;
+    }
+
+    .project-grid[data-cols="4"] > .poster-card {
+      grid-column: span 3;
+    }
+
+    .project-grid[data-pattern="five"] > .poster-card:nth-child(n + 4) {
+      grid-column: span 6;
+    }
+
+    .project-grid[data-pattern="seven"] > .poster-card:nth-child(n + 5) {
+      grid-column: span 4;
+    }
+
+    .project-grid[data-pattern="duo"] .poster-card__media {
+      padding-top: 72%;
+    }
+
+    .project-grid[data-pattern="trio"] .poster-card__media,
+    .project-grid[data-pattern="five"] .poster-card__media {
+      padding-top: 76%;
+    }
+
+    .project-grid[data-pattern="quad"] .poster-card__media,
+    .project-grid[data-pattern="six"] .poster-card__media {
+      padding-top: 78%;
+    }
+
+    .project-grid[data-pattern="seven"] .poster-card__media,
+    .project-grid[data-pattern="eight"] .poster-card__media {
+      padding-top: 88%;
+    }
+
+    .project-grid[data-pattern="duo"] .poster-card__title {
+      font-size: 1.44rem;
+    }
+
+    .project-grid[data-pattern="seven"] .poster-card__title,
+    .project-grid[data-pattern="eight"] .poster-card__title {
+      font-size: 1.08rem;
+    }
+
+    .poster-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(78, 39, 81, 0.1);
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(52, 26, 56, 0.08);
+    }
+
+
+    .poster-card.spotlight {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr);
+    }
+
+    .poster-card__media {
+      position: relative;
+      width: 100%;
+      padding-top: 80%; /* 5:4 aspect via padding hack — html2canvas-safe */
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(137, 73, 197, 0.09), rgba(78, 39, 81, 0.03));
+      border-bottom: 1px solid rgba(78, 39, 81, 0.08);
+    }
+
+    .poster-card.spotlight .poster-card__media {
+      padding-top: 75%; /* 4:3 aspect for spotlight */
+      border-right: 1px solid rgba(78, 39, 81, 0.08);
+      border-bottom: 0;
+    }
+
+    .poster-card__media > * {
+      position: absolute;
+      inset: 0;
+    }
+
+    .poster-card__photo {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .poster-card__placeholder {
+      padding: 18px;
+      display: grid;
+      align-content: stretch;
+      background: linear-gradient(135deg, rgba(78, 39, 81, 0.96), rgba(137, 73, 197, 0.8));
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .poster-card__placeholder::after {
+      content: "";
+      position: absolute;
+      right: -24px;
+      bottom: -30px;
+      width: 128px;
+      height: 128px;
+      border-radius: 28px;
+      border: 1px solid currentColor;
+      opacity: 0.14;
+      transform: rotate(16deg);
+    }
+
+    .poster-card__placeholder--paper {
+      background: linear-gradient(180deg, rgba(251, 248, 253, 1), rgba(243, 235, 248, 1));
+      color: var(--brand);
+    }
+
+    .poster-card__placeholder-stage {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .poster-card__placeholder-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.78;
+    }
+
+    .poster-card__placeholder-line {
+      width: 72px;
+      height: 2px;
+      background: currentColor;
+      opacity: 0.18;
+    }
+
+    .poster-card__placeholder-mark {
+      margin: 0;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: clamp(2.6rem, 4vw, 3.5rem);
+      font-weight: 500;
+      line-height: 0.88;
+      letter-spacing: -0.05em;
+    }
+
+    .poster-card__placeholder-chip {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .poster-card__placeholder--paper .poster-card__placeholder-chip {
+      background: rgba(137, 73, 197, 0.08);
+      border-color: rgba(137, 73, 197, 0.16);
+    }
+
+    .poster-card__placeholder--ink {
+      background: linear-gradient(135deg, var(--accent-deep), #11161f);
+      color: #ffffff;
+    }
+
+    .poster-card__placeholder--ink .poster-card__placeholder-chip {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .poster-card__placeholder--cream {
+      background: linear-gradient(180deg, var(--accent-warm-soft), var(--accent-warm));
+      color: var(--brand);
+    }
+
+    .poster-card__placeholder--cream .poster-card__placeholder-chip {
+      background: rgba(78, 39, 81, 0.06);
+      border-color: rgba(78, 39, 81, 0.18);
+    }
+
+    .poster-card__body {
+      position: relative;
+      padding: 16px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .poster-card.spotlight .poster-card__body {
+      padding: 24px;
+      gap: 12px;
+    }
+
+    .poster-card.spotlight .poster-card__byline {
+      margin-top: auto;
+      padding-top: 12px;
+    }
+
+    .poster-card__byline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 2px 0 0;
+    }
+
+    .poster-card__avatar {
+      flex: 0 0 auto;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: var(--paper-soft);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .poster-card__byline-text {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .poster-card.spotlight .poster-card__byline {
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    .poster-card.spotlight .poster-card__avatar {
+      width: 72px;
+      height: 72px;
+    }
+
+    .project-grid[data-cols="3"] .poster-card__avatar {
+      width: 36px;
+      height: 36px;
+    }
+
+    .project-grid[data-cols="3"] .poster-card__byline {
+      gap: 10px;
+    }
+
+    .project-grid[data-cols="4"] .poster-card__avatar {
+      width: 30px;
+      height: 30px;
+    }
+
+    .project-grid[data-cols="4"] .poster-card__byline {
+      gap: 8px;
+    }
+
+    .poster-card__top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .poster-card__discipline {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(137, 73, 197, 0.08);
+      color: var(--page-accent);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .poster-card__title {
+      margin: 0;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: 1.24rem;
+      font-weight: 500;
+      line-height: 1.03;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .project-grid[data-cols="3"] .poster-card__title {
+      font-size: 1.14rem;
+    }
+
+    .project-grid[data-cols="4"] .poster-card__title {
+      font-size: 1rem;
+    }
+
+    .poster-card.spotlight .poster-card__title {
+      font-size: clamp(2.45rem, 4vw, 3.2rem);
+      line-height: 0.94;
+    }
+
+    .poster-card__name {
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+    }
+
+    .poster-card__college {
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+
+    .poster-card__summary {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--ink-soft);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .poster-card.spotlight .poster-card__summary {
+      font-size: 1.0625rem;
+      line-height: 1.55;
+      -webkit-line-clamp: 6;
+      max-width: 48ch;
+    }
+
+    .project-grid[data-cols="3"] .poster-card__summary {
+      font-size: 0.8rem;
+      -webkit-line-clamp: 2;
+    }
+
+    .project-grid[data-cols="4"] .poster-card__summary {
+      display: none;
+    }
+
+    .poster-empty {
+      display: grid;
+      place-items: center;
+      border: 1px dashed rgba(78, 39, 81, 0.2);
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(247, 242, 250, 0.82), rgba(255, 255, 255, 0.92));
+      padding: 56px 28px;
+      text-align: center;
+    }
+
+    .poster-empty strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brand);
+    }
+
+    .poster-empty h3 {
+      margin: 0;
+      font-family: "NeueHaasGrotDispRound", Helvetica, Arial, sans-serif;
+      font-size: 2rem;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .poster-empty p {
+      margin: 12px auto 0;
+      max-width: 34ch;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    .hidden-input {
+      display: none !important;
+    }
+
+    #export-stage {
+      position: absolute;
+      left: -20000px;
+      top: 0;
+      width: max-content;
+      visibility: visible;
+      overflow: visible;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @media (max-width: 1180px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .page {
+        padding: 20px 14px 32px;
+      }
+
+      .grid.two {
+        grid-template-columns: 1fr;
+      }
+
+      .poster-page {
+        padding: 20px;
+        aspect-ratio: auto;
+      }
+
+      .poster-card.spotlight {
+        display: flex;
+      }
+
+      .project-grid[data-cols="4"] > .poster-card,
+      .project-grid[data-pattern="seven"] > .poster-card,
+      .project-grid[data-pattern="eight"] > .poster-card {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .project-editor > summary {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-actions,
+      .btn-row,
+      .mini-row {
+        width: 100%;
+      }
+
+      .btn,
+      .btn.secondary,
+      .btn.brand,
+      .mini-btn {
+        width: 100%;
+      }
+
+      .poster-header,
+      .poster-header--compact {
+        padding: 16px;
+      }
+
+      .poster-meta-row {
+        display: grid;
+      }
+
+      .poster-meta-pill {
+        justify-content: center;
+      }
+
+      .project-grid > .poster-card,
+      .project-grid[data-cols="2"] > .poster-card,
+      .project-grid[data-cols="3"] > .poster-card,
+      .project-grid[data-cols="4"] > .poster-card,
+      .project-grid[data-pattern="five"] > .poster-card,
+      .project-grid[data-pattern="seven"] > .poster-card,
+      .project-grid[data-pattern="eight"] > .poster-card {
+        grid-column: 1 / -1;
+      }
+    }
+
+    /* ================================================== */
+    /* === MEMPHIS THEME — 80s pastel geometric === */
+    /* ================================================== */
+
+    .poster-page {
+      background:
+        radial-gradient(circle at 12% 18%, #ffd2b3 0 6%, transparent 7%),
+        radial-gradient(circle at 88% 12%, #b3e8d5 0 5%, transparent 6%),
+        radial-gradient(circle at 6% 78%, #d8c2ff 0 5%, transparent 6%),
+        radial-gradient(circle at 92% 88%, #ff9aae 0 7%, transparent 8%),
+        #fff8ed;
+      color: #1a0a1c;
+      border: 3px solid #1a0a1c;
+      border-radius: 12px;
+    }
+
+    .poster-page::before {
+      height: 12px;
+      background: repeating-linear-gradient(
+        90deg,
+        #ff9aae 0 12px,
+        #1a0a1c 12px 20px,
+        #ffd16b 20px 32px,
+        #1a0a1c 32px 40px,
+        #4ec9b0 40px 52px,
+        #1a0a1c 52px 60px,
+        #b889ff 60px 72px,
+        #1a0a1c 72px 80px
+      );
+      z-index: 5;
+    }
+
+    .poster-page::after { display: none; }
+
+    .poster-header {
+      background: transparent;
+      border: none;
+      padding: 48px 44px 32px;
+      color: #1a0a1c;
+    }
+
+    .poster-brand { color: #ff5e7a; letter-spacing: 0.26em; font-weight: 700; }
+    .poster-brand::after { background: #ff5e7a; width: 72px; }
+
+    .poster-pagecount {
+      background: #ffd16b;
+      color: #1a0a1c;
+      border: 2px solid #1a0a1c;
+      letter-spacing: 0.18em;
+      font-weight: 700;
+    }
+
+    .poster-kicker { color: #4ec9b0; letter-spacing: 0.32em; font-weight: 700; font-size: 0.82rem; }
+
+    .poster-title {
+      color: #1a0a1c;
+      font-size: clamp(4.5rem, 12vw, 10rem);
+      letter-spacing: -0.04em;
+      line-height: 0.86;
+      max-width: none;
+      text-transform: uppercase;
+      text-shadow:
+        4px 4px 0 #ff9aae,
+        8px 8px 0 #ffd16b;
+    }
+
+    .poster-header--compact .poster-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      text-shadow: 2px 2px 0 #ff9aae, 4px 4px 0 #ffd16b;
+    }
+
+    .poster-subtitle { color: rgba(26, 10, 28, 0.72); font-size: 1rem; max-width: 40ch; margin-top: 12px; }
+
+    .poster-meta-pill {
+      background: #b889ff;
+      color: #1a0a1c;
+      border: 2px solid #1a0a1c;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+    }
+
+    .project-grid { padding: 28px 40px 44px; gap: 22px; }
+
+    .poster-card {
+      background: #ffffff;
+      border: 3px solid #1a0a1c;
+      border-radius: 18px;
+      box-shadow: 6px 6px 0 #1a0a1c;
+    }
+
+    .poster-card:nth-child(4n+1) { background: #ffe4d2; box-shadow: 6px 6px 0 #ff5e7a; }
+    .poster-card:nth-child(4n+2) { background: #d2f1e5; box-shadow: 6px 6px 0 #4ec9b0; }
+    .poster-card:nth-child(4n+3) { background: #efe3ff; box-shadow: 6px 6px 0 #b889ff; }
+    .poster-card:nth-child(4n+4) { background: #fff1c2; box-shadow: 6px 6px 0 #ffd16b; }
+
+    .poster-card__media { border-bottom: 3px solid #1a0a1c; }
+    .poster-card.spotlight .poster-card__media { border-right: 3px solid #1a0a1c; border-bottom: 0; }
+
+    .poster-card__discipline {
+      background: #1a0a1c;
+      color: #ffd16b;
+      border-radius: 999px;
+      letter-spacing: 0.16em;
+      font-weight: 700;
+    }
+
+    .poster-card__title { color: #1a0a1c; letter-spacing: -0.02em; text-transform: uppercase; }
+    .poster-card__name { color: #ff5e7a; letter-spacing: 0.14em; }
+    .poster-card__college { color: rgba(26, 10, 28, 0.65); }
+
+    .poster-card__avatar { border: 3px solid #1a0a1c; }
+    .poster-card.spotlight .poster-card__avatar { border-width: 4px; }
+
+    .poster-card__summary { color: rgba(26, 10, 28, 0.78); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <div class="masthead__brand">LJC Design + Engineering</div>
+      <h1>Gallery Night Builder</h1>
+      <p>
+        Build a clean, office-specific Gallery Night board. Set the office details, add the
+        projects, and export a finished poster as PDF or PNG.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="controls panel">
+        <div class="panel__section">
+          <p class="section-label">Builder</p>
+          <h2 class="section-title">Simple Setup</h2>
+          <p class="section-copy">
+            Choose an office, set that office’s date and location, then add the projects that
+            belong on the board. The poster reflows automatically for small and large groups.
+          </p>
+        </div>
+
+        <div class="panel__section stack">
+          <div class="field">
+            <span class="field__label">1. Choose Office</span>
+            <div class="office-tabs" id="office-tabs"></div>
+          </div>
+
+          <div class="field">
+            <label for="office-date">Event Date</label>
+            <input id="office-date" type="text" />
+          </div>
+        </div>
+
+        <div class="panel__section stack">
+          <p class="section-label">2. Add Projects</p>
+          <div class="note">
+            <strong>What Shows Up</strong>
+            <p>
+              Each card uses the hero image, project title, intern name, college, and discipline.
+              Reorder the list any time to change the board sequence.
+            </p>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn brand" type="button" id="add-project-btn">Add Project</button>
+          </div>
+
+          <div class="project-list" id="project-list"></div>
+        </div>
+
+        <div class="status">
+          <p class="status__label">Status</p>
+          <p class="status__message" id="status-message">Ready to build the Gallery Night piece.</p>
+        </div>
+      </section>
+
+      <section class="preview panel">
+        <div class="preview__head">
+          <div>
+            <p class="section-label">Preview</p>
+            <h2>Live Poster</h2>
+            <p>
+              The preview updates as you edit and repaginates automatically, so each office board
+              stays tidy whether it has one project or a full group.
+            </p>
+          </div>
+          <div class="btn-row">
+            <button class="btn secondary" type="button" id="download-png-btn">Download PNG</button>
+            <button class="btn brand" type="button" id="download-pdf-btn">Download PDF</button>
+          </div>
+        </div>
+
+        <div class="preview__body">
+          <div class="poster-stack" id="poster-preview"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="export-stage" aria-hidden="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script>
+    (function () {
+      var STORAGE_KEY = "ljc-gallery-night-builder-v4";
+      var BRAND_ACCENT = "#4e2751";
+      var BRAND_ACCENT_ALT = "#8949c5";
+
+      var DEFAULT_OFFICES = [
+        { id: "chicago", name: "Chicago", location: "35 E. Wacker Dr., Suite 1300" },
+        { id: "denver", name: "Denver", location: "710 10th St., Suite 170" },
+        { id: "kansas-city", name: "Kansas City", location: "9829 Commerce Parkway" },
+        { id: "los-angeles", name: "Los Angeles", location: "8590 National Blvd." },
+        { id: "phoenix", name: "Phoenix", location: "4300 E. Camelback Rd., Suite 300" },
+        { id: "st-louis", name: "St. Louis", location: "8640 Evans Ave." }
+      ];
+
+      // Intern roster — from the official 2026 LJC program roster plus local assets/Interns folders
+      var INTERNS = [
+        { id: "joey-friedel", name: "Joey Friedel", officeId: "st-louis", discipline: "Structural Engineering", college: "Missouri S&T", headshot: "../../assets/Interns/Joey Friedel/headshot.webp" },
+        { id: "grant-bailey", name: "Grant Bailey", officeId: "st-louis", discipline: "Mechanical Engineering", college: "Missouri S&T", headshot: "../../assets/Interns/Grant Bailey/headshot.svg" },
+        { id: "mallory-hastings", name: "Mallory Hastings", officeId: "kansas-city", discipline: "Structural Engineering", college: "San Diego State University", headshot: "../../assets/Interns/Mallory Hastings/headshot.jpeg" },
+        { id: "max-kreh", name: "Max Kreh", officeId: "st-louis", discipline: "Electrical Engineering", college: "Missouri S&T", headshot: "../../assets/Interns/Max Kreh/headshot.jpg" },
+        { id: "nevaeh-neal", name: "Nevaeh Neal", officeId: "st-louis", discipline: "Project Engineering", college: "University of Missouri", headshot: "../../assets/Interns/Nevaeh Neal/headshot.jpg" },
+        { id: "emma-swanson", name: "Emma Swanson", officeId: "kansas-city", discipline: "Structural Engineering", college: "University of Kansas", headshot: "../../assets/Interns/Emma Swanson/headshot.png" },
+        { id: "isaac-lee", name: "Isaac Lee", officeId: "st-louis", discipline: "Mechanical Engineering", college: "Auburn University", headshot: "../../assets/Interns/Isaac Lee/headshot.jpg" },
+        { id: "hope-crane", name: "Hope Crane", officeId: "st-louis", discipline: "Planning & Landscape", college: "Washington University in St. Louis", headshot: "../../assets/Interns/Hope Crane/headshot.jpg" },
+        { id: "marco-maniaci", name: "Marco Maniaci", officeId: "chicago", discipline: "Architecture", college: "University of Illinois Urbana-Champaign", headshot: "../../assets/Interns/Marco Maniaci/headshot.jpg" },
+        { id: "mia-maddock", name: "Mia Maddock", officeId: "st-louis", discipline: "Architecture", college: "University of Kansas", headshot: "../../assets/Interns/Mia Maddock/headshot.jpg" },
+        { id: "fiona-pedone", name: "Fiona Pedone", officeId: "chicago", discipline: "Interiors", college: "Kansas State University", headshot: "../../assets/Interns/Fiona Pedone/headshot.jpg" },
+        { id: "ella-figgins", name: "Ella Figgins", officeId: "phoenix", discipline: "Interiors", college: "Kansas State University", headshot: "../../assets/Interns/Ella Figgins/headshot.jpg" },
+        { id: "sheri-archibald", name: "Sheri Archibald", officeId: "denver", discipline: "Architecture", college: "Colorado State University", headshot: "../../assets/Interns/Sheri Archibald/headshot.jpg" },
+        { id: "hope-schmitt", name: "Hope Schmitt", officeId: "st-louis", discipline: "Architecture", college: "University of Arizona", headshot: "../../assets/Interns/Hope Schmitt/headshot.jpg" },
+        { id: "mackenzie-clark", name: "Mackenzie Clark", officeId: "st-louis", discipline: "Interiors", college: "Maryville University", headshot: "../../assets/Interns/Mackenzie Clark/headshot.jpg" },
+        { id: "mary-kate-sullenberger", name: "Mary Kate Sullenberger", officeId: "st-louis", discipline: "Architecture", college: "Washington University in St. Louis", headshot: "../../assets/Interns/Mary Kate Sullenberger/headshot.jpg" },
+        { id: "aaron-vo", name: "Aaron Vo", officeId: "los-angeles", discipline: "Architecture", college: "University of Southern California", headshot: "../../assets/Interns/Aaron Vo/headshot.jpg" },
+        { id: "samantha-berger", name: "Samantha Berger", officeId: "st-louis", discipline: "Interiors", college: "Texas Christian University", headshot: "../../assets/Interns/Samantha Berger/headshot.jpg" },
+        { id: "deonante-sutton", name: "Deonante Sutton", officeId: "chicago", discipline: "Architecture", college: "University of Illinois Urbana-Champaign", headshot: "../../assets/Interns/Deonante Sutton/headshot.svg" },
+        { id: "sterling-fitzgerald", name: "Sterling Fitzgerald", officeId: "phoenix", discipline: "Architecture", college: "Syracuse University", headshot: "../../assets/Interns/Sterling Fitzgerald/headshot.jpg" },
+        { id: "casey-kowalsky", name: "Casey Kowalsky", officeId: "chicago", discipline: "Architecture", college: "Illinois Institute of Technology", headshot: "../../assets/Interns/Casey Kowalsky/headshot.svg" },
+        { id: "mallory-underwood", name: "Mallory Underwood", officeId: "st-louis", discipline: "Mission Critical", college: "Ranken Technical College", headshot: "../../assets/Interns/Mallory Underwood/headshot.svg" },
+        { id: "sneha-shanmuganthan", name: "Sneha Shanmuganthan", officeId: "phoenix", discipline: "Electrical Engineering", college: "University of Arizona", headshot: "../../assets/Interns/Sneha Shanmuganthan/headshot.svg" },
+        { id: "fiona-hernandez", name: "Fiona Hernandez", officeId: "chicago", discipline: "Architecture", college: "High School Student", headshot: "../../assets/Interns/Fiona Hernandez/headshot.svg" },
+        { id: "jack-lewis", name: "Jack Lewis", officeId: "st-louis", discipline: "Mission Critical", college: "University of Kansas", headshot: "../../assets/Interns/Jack Lewis/headshot.svg" },
+        { id: "sam-bromley", name: "Sam Bromley", officeId: "chicago", discipline: "", college: "", headshot: "../../assets/Interns/Sam Bromley/headshot.svg" }
+      ];
+
+      var DEFAULT_EVENT = {
+        title: "Gallery Night",
+        subtitle: "A showcase of design projects from the 2026 intern class.",
+        date: "June 18, 2026",
+        venue: "LJC Atrium",
+        footer: "LJC Design + Engineering"
+      };
+
+      var refs = {
+        officeTabs: document.getElementById("office-tabs"),
+        officeDate: document.getElementById("office-date"),
+        addProjectBtn: document.getElementById("add-project-btn"),
+        projectList: document.getElementById("project-list"),
+        posterPreview: document.getElementById("poster-preview"),
+        downloadPdfBtn: document.getElementById("download-pdf-btn"),
+        downloadPngBtn: document.getElementById("download-png-btn"),
+        statusMessage: document.getElementById("status-message")
+      };
+
+      function slugify(value) {
+        return String(value || "")
+          .toLowerCase()
+          .trim()
+          .replace(/&/g, "and")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "") || "office";
+      }
+
+      function makeId(prefix) {
+        return prefix + "-" + Math.random().toString(36).slice(2, 10);
+      }
+
+      function deepCopy(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function createBlankProject(officeId, overrides) {
+        return Object.assign(
+          {
+            id: makeId("project"),
+            officeId: officeId,
+            internId: "",
+            internHeadshot: "",
+            name: "",
+            college: "",
+            discipline: "",
+            projectTitle: "",
+            description: "",
+            heroImage: "",
+            heroImageName: ""
+          },
+          overrides || {}
+        );
+      }
+
+      function createDefaultState() {
+        var projectsByOffice = {};
+        var offices = DEFAULT_OFFICES.map(function (office) {
+          return Object.assign({}, office, { eventDate: DEFAULT_EVENT.date });
+        });
+
+        offices.forEach(function (office) {
+          projectsByOffice[office.id] = [];
+        });
+
+        return {
+          event: deepCopy(DEFAULT_EVENT),
+          offices: offices,
+          selectedOfficeId: offices[0].id,
+          projectsByOffice: projectsByOffice
+        };
+      }
+
+      function normalizeState(raw) {
+        var defaults = createDefaultState();
+        if (!raw || typeof raw !== "object") {
+          return defaults;
+        }
+
+        var validIds = DEFAULT_OFFICES.map(function (o) { return o.id; });
+        var offices = Array.isArray(raw.offices) && raw.offices.length
+          ? raw.offices
+              .map(function (office) {
+                return {
+                  id: slugify(office.id || office.name),
+                  name: office.name || "Office",
+                  location: office.location || "",
+                  eventDate: office.eventDate || (raw.event && raw.event.date) || defaults.event.date
+                };
+              })
+              .filter(function (office) {
+                return validIds.indexOf(office.id) !== -1;
+              })
+          : defaults.offices;
+        if (!offices.length) {
+          offices = defaults.offices;
+        }
+
+        var projectsByOffice = {};
+        offices.forEach(function (office) {
+          var incoming = raw.projectsByOffice && Array.isArray(raw.projectsByOffice[office.id])
+            ? raw.projectsByOffice[office.id]
+            : [];
+          projectsByOffice[office.id] = incoming.map(function (project) {
+            var normalized = createBlankProject(office.id, project);
+            // Re-derive headshot from intern roster, clean up legacy heroImage that was a headshot
+            if (normalized.internId) {
+              var intern = findInternById(normalized.internId);
+              if (intern) {
+                normalized.internHeadshot = intern.headshot;
+                if (normalized.heroImage && normalized.heroImage.indexOf("../../assets/Interns/") === 0) {
+                  normalized.heroImage = "";
+                  normalized.heroImageName = "";
+                }
+              }
+            }
+            return normalized;
+          });
+        });
+
+        var selectedOfficeId = offices.some(function (office) {
+          return office.id === raw.selectedOfficeId;
+        }) ? raw.selectedOfficeId : offices[0].id;
+
+        return {
+          event: Object.assign({}, defaults.event, raw.event || {}),
+          offices: offices,
+          selectedOfficeId: selectedOfficeId,
+          projectsByOffice: projectsByOffice
+        };
+      }
+
+      function loadState() {
+        try {
+          var stored = window.localStorage.getItem(STORAGE_KEY);
+          return normalizeState(stored ? JSON.parse(stored) : null);
+        } catch (error) {
+          return createDefaultState();
+        }
+      }
+
+      var state = loadState();
+
+      function persistState() {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function showStatus(message) {
+        refs.statusMessage.textContent = message;
+      }
+
+      function getOfficeById(officeId) {
+        return state.offices.find(function (office) {
+          return office.id === officeId;
+        }) || state.offices[0];
+      }
+
+      function officeDisplayName(office) {
+        return (office && office.name && office.name.trim()) || "Office";
+      }
+
+      function officeLocationLine(office) {
+        return (office && office.location && office.location.trim()) || "";
+      }
+
+      function officeEventDate(office) {
+        return (office && office.eventDate) || state.event.date || DEFAULT_EVENT.date;
+      }
+
+      function selectedOfficeProjects() {
+        return state.projectsByOffice[state.selectedOfficeId] || [];
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function downloadBlob(blob, fileName) {
+        var url = URL.createObjectURL(blob);
+        var anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        URL.revokeObjectURL(url);
+      }
+
+      function loadImageFromFile(file) {
+        return new Promise(function (resolve, reject) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            var image = new Image();
+            image.onload = function () { resolve(image); };
+            image.onerror = reject;
+            image.src = reader.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function optimizeImageFile(file) {
+        return loadImageFromFile(file).then(function (image) {
+          var maxDimension = 1800;
+          var width = image.width;
+          var height = image.height;
+
+          if (width > maxDimension || height > maxDimension) {
+            var scale = Math.min(maxDimension / width, maxDimension / height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+
+          var canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext("2d").drawImage(image, 0, 0, width, height);
+          return {
+            dataUrl: canvas.toDataURL("image/jpeg", 0.88),
+            fileName: file.name
+          };
+        });
+      }
+
+      function pageLayoutMeta(count, pageIndex) {
+        var header = pageIndex > 0 ? "compact" : "hero";
+        if (count <= 1) return { cols: 1, layout: "spotlight", header: header, pattern: "spotlight" };
+        if (count === 2) return { cols: 2, layout: "grid", header: header, pattern: "duo" };
+        if (count === 3) return { cols: 3, layout: "grid", header: header, pattern: "trio" };
+        if (count === 4) return { cols: 2, layout: "grid", header: header, pattern: "quad" };
+        if (count === 5) return { cols: 3, layout: "grid", header: header, pattern: "five" };
+        if (count === 6) return { cols: 3, layout: "grid", header: header, pattern: "six" };
+        if (count === 7) return { cols: 4, layout: "grid", header: header, pattern: "seven" };
+        return { cols: 4, layout: "grid", header: header, pattern: "eight" };
+      }
+
+      function paginateProjects(projects) {
+        if (!projects.length) {
+          return [[]];
+        }
+        var totalProjects = projects.length;
+        var pageCount = Math.ceil(totalProjects / 8);
+        var baseSize = Math.floor(totalProjects / pageCount);
+        var remainder = totalProjects % pageCount;
+        var pages = [];
+        var cursor = 0;
+
+        for (var pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
+          var size = baseSize + (pageIndex < remainder ? 1 : 0);
+          pages.push(projects.slice(cursor, cursor + size));
+          cursor += size;
+        }
+
+        return pages;
+      }
+
+      function renderOfficeTabs() {
+        refs.officeTabs.innerHTML = state.offices.map(function (office) {
+          var count = (state.projectsByOffice[office.id] || []).length;
+          return (
+            "<button class=\"office-tab" + (office.id === state.selectedOfficeId ? " active" : "") + "\" type=\"button\" data-office-tab=\"" + escapeHtml(office.id) + "\">" +
+              "<span>" + escapeHtml(officeDisplayName(office)) + "</span>" +
+              "<small>" + count + "</small>" +
+            "</button>"
+          );
+        }).join("");
+      }
+
+      function renderOfficeFields() {
+        var office = getOfficeById(state.selectedOfficeId);
+        refs.officeDate.value = office.eventDate || "";
+      }
+
+      function renderProjectList() {
+        var projects = selectedOfficeProjects();
+        if (!projects.length) {
+          refs.projectList.innerHTML =
+            "<div class=\"note\"><strong>No projects yet</strong><p>Add the first project to start this office board.</p></div>";
+          return;
+        }
+
+        refs.projectList.innerHTML = projects.map(function (project, index) {
+          var summary = [project.name, project.discipline].filter(Boolean).join(" · ");
+          var preview = project.heroImage
+            ? "<img src=\"" + project.heroImage + "\" alt=\"" + escapeHtml(project.projectTitle || project.name || "Project hero") + "\" />"
+            : "<div class=\"upload-placeholder\">Upload the hero image for this project.</div>";
+
+          return (
+            "<details class=\"project-editor\" data-project-id=\"" + escapeHtml(project.id) + "\"" + (index === 0 ? " open" : "") + ">" +
+              "<summary>" +
+                "<span class=\"project-number\">" + String(index + 1).padStart(2, "0") + "</span>" +
+                "<div class=\"project-summary\">" +
+                  "<h4>" + escapeHtml(project.projectTitle || "Untitled Project") + "</h4>" +
+                  "<p>" + escapeHtml(summary || "Add the intern, discipline, and project details below.") + "</p>" +
+                "</div>" +
+                "<div class=\"summary-actions\">" +
+                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"up\" title=\"Move up\">↑</button>" +
+                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"down\" title=\"Move down\">↓</button>" +
+                  "<button class=\"summary-btn danger\" type=\"button\" data-project-action=\"delete\" title=\"Delete\">×</button>" +
+                "</div>" +
+              "</summary>" +
+              "<div class=\"project-editor__body\">" +
+                internDropdownTemplate(project) +
+                fieldTemplate("Project Title", "projectTitle", project.projectTitle) +
+                fieldTemplate("Project Description", "description", project.description, "textarea") +
+                fieldTemplate("Discipline", "discipline", project.discipline) +
+                fieldTemplate("College / University", "college", project.college) +
+                "<div class=\"field\">" +
+                  "<label>Project Hero Image</label>" +
+                  "<input type=\"file\" accept=\"image/*\" data-image-input=\"true\" />" +
+                "</div>" +
+                "<div class=\"upload-preview\">" + preview + "</div>" +
+              "</div>" +
+            "</details>"
+          );
+        }).join("");
+      }
+
+      function fieldTemplate(label, field, value, type) {
+        var input = type === "textarea"
+          ? "<textarea data-project-field=\"" + escapeHtml(field) + "\" rows=\"3\">" + escapeHtml(value || "") + "</textarea>"
+          : "<input type=\"text\" data-project-field=\"" + escapeHtml(field) + "\" value=\"" + escapeHtml(value || "") + "\" />";
+        return (
+          "<div class=\"field\">" +
+            "<label>" + escapeHtml(label) + "</label>" +
+            input +
+          "</div>"
+        );
+      }
+
+      function internsForOffice(officeId) {
+        return INTERNS.filter(function (intern) { return intern.officeId === officeId; })
+          .sort(function (a, b) { return a.name.localeCompare(b.name); });
+      }
+
+      function findInternById(internId) {
+        for (var i = 0; i < INTERNS.length; i += 1) {
+          if (INTERNS[i].id === internId) {
+            return INTERNS[i];
+          }
+        }
+        return null;
+      }
+
+      function internDropdownTemplate(project) {
+        var officeId = state.selectedOfficeId;
+        var roster = internsForOffice(officeId);
+        var options = ["<option value=\"\">Select intern…</option>"];
+        roster.forEach(function (intern) {
+          var selected = project.internId === intern.id ? " selected" : "";
+          options.push(
+            "<option value=\"" + escapeHtml(intern.id) + "\"" + selected + ">" +
+              escapeHtml(intern.name) +
+            "</option>"
+          );
+        });
+        return (
+          "<div class=\"field\">" +
+            "<label>Intern</label>" +
+            "<select data-project-field=\"internId\">" + options.join("") + "</select>" +
+          "</div>"
+        );
+      }
+
+      function placeholderStyleName(project, index, isHero) {
+        if (isHero) {
+          return "default";
+        }
+        var styles = ["default", "cream", "ink", "paper"];
+        return styles[index % styles.length];
+      }
+
+      function placeholderMediaMarkup(project, office, styleName) {
+        var fallbackTag = project.discipline || "Design Showcase";
+        var wrapperClass = "poster-card__placeholder";
+        if (styleName && styleName !== "default") {
+          wrapperClass += " poster-card__placeholder--" + styleName;
+        }
+        return (
+          "<div class=\"" + wrapperClass + "\">" +
+            "<div class=\"poster-card__placeholder-stage\">" +
+              "<span class=\"poster-card__placeholder-tag\">LJC Gallery Night</span>" +
+              "<div>" +
+                "<div class=\"poster-card__placeholder-mark\">LJC</div>" +
+                "<div class=\"poster-card__placeholder-line\" aria-hidden=\"true\"></div>" +
+              "</div>" +
+              "<span class=\"poster-card__placeholder-chip\">" + escapeHtml(fallbackTag) + "</span>" +
+            "</div>" +
+          "</div>"
+        );
+      }
+
+      function posterPageTemplate(office, pageProjects, pageIndex, totalPages, startNumber, totalProjects) {
+        var accent = BRAND_ACCENT;
+        var accentAlt = BRAND_ACCENT_ALT;
+        var layout = pageLayoutMeta(pageProjects.length, pageIndex);
+
+        if (!pageProjects.length) {
+          return (
+            "<section class=\"poster-page\" data-layout=\"empty\" data-header=\"" + layout.header + "\" style=\"--page-accent:" + accent + ";--page-accent-alt:" + accentAlt + ";\">" +
+              posterHeaderTemplate(office, pageIndex, totalPages, layout.header, totalProjects) +
+              "<div class=\"poster-empty\">" +
+                "<div>" +
+                  "<strong>Waiting on content</strong>" +
+                  "<h3>Build " + escapeHtml(officeDisplayName(office)) + " here.</h3>" +
+                  "<p>Add projects in the left column and this poster will update automatically.</p>" +
+                "</div>" +
+              "</div>" +
+            "</section>"
+          );
+        }
+
+        var cards = pageProjects.map(function (project, index) {
+          var cardClass = "poster-card";
+          var isSpotlight = layout.layout === "spotlight" && index === 0;
+          if (isSpotlight) {
+            cardClass += " spotlight";
+          }
+          var mediaMarkup = project.heroImage
+            ? "<div class=\"poster-card__photo\" role=\"img\" aria-label=\"" + escapeHtml(project.projectTitle || project.name || "Project hero") + "\" style=\"background-image: url('" + project.heroImage + "')\"></div>"
+            : placeholderMediaMarkup(project, office, placeholderStyleName(project, startNumber + index, isSpotlight));
+          var avatarMarkup = project.internHeadshot
+            ? "<div class=\"poster-card__avatar\" role=\"img\" aria-label=\"" + escapeHtml((project.name || "Intern") + " headshot") + "\" style=\"background-image: url('" + project.internHeadshot + "')\"></div>"
+            : "";
+          var disciplineMarkup = project.discipline
+            ? "<span class=\"poster-card__discipline\">" + escapeHtml(project.discipline) + "</span>"
+            : "";
+          var collegeMarkup = project.college
+            ? "<p class=\"poster-card__college\">" + escapeHtml(project.college) + "</p>"
+            : "";
+          var bylineMarkup =
+            "<div class=\"poster-card__byline\">" +
+              avatarMarkup +
+              "<div class=\"poster-card__byline-text\">" +
+                "<p class=\"poster-card__name\">" + escapeHtml(project.name || "Intern Name") + "</p>" +
+                collegeMarkup +
+              "</div>" +
+            "</div>";
+          return (
+            "<article class=\"" + cardClass + "\">" +
+              "<div class=\"poster-card__media\">" +
+                mediaMarkup +
+              "</div>" +
+              "<div class=\"poster-card__body\">" +
+                (disciplineMarkup ? "<div class=\"poster-card__top\">" + disciplineMarkup + "</div>" : "") +
+                "<h3 class=\"poster-card__title\">" + escapeHtml(project.projectTitle || "Untitled Project") + "</h3>" +
+                (project.description ? "<p class=\"poster-card__summary\">" + escapeHtml(project.description) + "</p>" : "") +
+                bylineMarkup +
+              "</div>" +
+            "</article>"
+          );
+        }).join("");
+
+        return (
+          "<section class=\"poster-page\" data-layout=\"" + layout.layout + "\" data-header=\"" + layout.header + "\" style=\"--page-accent:" + accent + ";--page-accent-alt:" + accentAlt + ";\">" +
+            posterHeaderTemplate(office, pageIndex, totalPages, layout.header, totalProjects) +
+            "<div class=\"project-grid\" data-layout=\"" + layout.layout + "\" data-cols=\"" + layout.cols + "\" data-pattern=\"" + layout.pattern + "\">" + cards + "</div>" +
+          "</section>"
+        );
+      }
+
+      function posterHeaderTemplate(office, pageIndex, totalPages, variant, totalProjects) {
+        var dateLine = officeEventDate(office);
+        var subtitle = pageIndex > 0
+          ? totalProjects + " project" + (totalProjects === 1 ? "" : "s") + " across " + totalPages + " page" + (totalPages === 1 ? "" : "s")
+          : "";
+        var meta = [
+          "<span class=\"poster-meta-pill\">" + escapeHtml(dateLine) + "</span>"
+        ];
+
+        var pagecountMarkup = totalPages > 1
+          ? "<span class=\"poster-pagecount\">" + escapeHtml(String(pageIndex + 1).padStart(2, "0") + " / " + String(totalPages).padStart(2, "0")) + "</span>"
+          : "";
+        var subtitleMarkup = subtitle
+          ? "<p class=\"poster-subtitle\">" + escapeHtml(subtitle) + "</p>"
+          : "";
+
+        return (
+          "<div class=\"poster-header" + (variant === "compact" ? " poster-header--compact" : "") + "\">" +
+            "<div class=\"poster-header__top\">" +
+              "<p class=\"poster-brand\">LJC Design + Engineering</p>" +
+              "<p class=\"poster-kicker\">" + escapeHtml(pageIndex > 0 ? "Project Board Continued" : "Intern Project Showcase") + "</p>" +
+              pagecountMarkup +
+            "</div>" +
+            "<div>" +
+              "<" + (variant === "compact" ? "h2" : "h1") + " class=\"poster-title\">" + escapeHtml(DEFAULT_EVENT.title) + "</" + (variant === "compact" ? "h2" : "h1") + ">" +
+              subtitleMarkup +
+            "</div>" +
+            "<div class=\"poster-meta-row\">" + meta.join("") + "</div>" +
+          "</div>"
+        );
+      }
+
+      function renderPosterPreview() {
+        var office = getOfficeById(state.selectedOfficeId);
+        var projects = selectedOfficeProjects();
+        var pages = paginateProjects(projects);
+        var runningTotal = 0;
+
+        refs.posterPreview.innerHTML = pages.map(function (pageProjects, pageIndex) {
+          var markup = posterPageTemplate(office, pageProjects, pageIndex, pages.length, runningTotal, projects.length);
+          runningTotal += pageProjects.length;
+          return markup;
+        }).join("");
+
+        refs.downloadPdfBtn.disabled = !projects.length;
+        refs.downloadPngBtn.disabled = !projects.length;
+      }
+
+      function renderAll() {
+        renderOfficeTabs();
+        renderOfficeFields();
+        renderProjectList();
+        renderPosterPreview();
+        persistState();
+      }
+
+      function updateOfficeFields() {
+        var office = getOfficeById(state.selectedOfficeId);
+        office.eventDate = refs.officeDate.value.trim();
+        persistState();
+        renderPosterPreview();
+      }
+
+      function addBlankProject() {
+        state.projectsByOffice[state.selectedOfficeId].push(createBlankProject(state.selectedOfficeId));
+        persistState();
+        renderAll();
+        showStatus("Blank project added to the selected office.");
+      }
+
+      function reorderProject(projectId, direction) {
+        var list = selectedOfficeProjects();
+        var index = list.findIndex(function (project) {
+          return project.id === projectId;
+        });
+        if (index < 0) {
+          return;
+        }
+
+        var nextIndex = direction === "up" ? index - 1 : index + 1;
+        if (nextIndex < 0 || nextIndex >= list.length) {
+          return;
+        }
+
+        var moved = list.splice(index, 1)[0];
+        list.splice(nextIndex, 0, moved);
+        persistState();
+        renderAll();
+      }
+
+      function removeProject(projectId) {
+        state.projectsByOffice[state.selectedOfficeId] = selectedOfficeProjects().filter(function (project) {
+          return project.id !== projectId;
+        });
+        persistState();
+        renderAll();
+        showStatus("Project removed from the selected office.");
+      }
+
+      function updateProjectField(projectId, field, value) {
+        var project = selectedOfficeProjects().find(function (item) {
+          return item.id === projectId;
+        });
+        if (!project) {
+          return;
+        }
+
+        project[field] = value;
+        persistState();
+        renderPosterPreview();
+      }
+
+      function selectInternForProject(projectId, internId) {
+        var project = selectedOfficeProjects().find(function (item) {
+          return item.id === projectId;
+        });
+        if (!project) {
+          return;
+        }
+
+        project.internId = internId || "";
+
+        if (!internId) {
+          project.name = "";
+          project.internHeadshot = "";
+          persistState();
+          renderAll();
+          return;
+        }
+
+        var intern = findInternById(internId);
+        if (!intern) {
+          persistState();
+          renderAll();
+          return;
+        }
+
+        project.name = intern.name;
+        project.discipline = intern.discipline;
+        project.college = intern.college;
+        project.internHeadshot = intern.headshot;
+        // Clear any stale heroImage that was previously auto-populated from a headshot
+        if (project.heroImage && project.heroImage.indexOf("../../assets/Interns/") === 0) {
+          project.heroImage = "";
+          project.heroImageName = "";
+        }
+        persistState();
+        renderAll();
+      }
+
+      function loadDemoContent() {
+        var office = getOfficeById(state.selectedOfficeId);
+        if (selectedOfficeProjects().length && !window.confirm("Replace the current office projects with demo content?")) {
+          return;
+        }
+
+        state.projectsByOffice[office.id] = [
+          createBlankProject(office.id, {
+            name: "Avery Johnson",
+            college: "University of Kansas",
+            discipline: "Interiors",
+            projectTitle: "Lobby as Living Room"
+          }),
+          createBlankProject(office.id, {
+            name: "Camila Reyes",
+            college: "Iowa State University",
+            discipline: "Architecture",
+            projectTitle: "Warehouse Recast"
+          }),
+          createBlankProject(office.id, {
+            name: "Mason Patel",
+            college: "Missouri S&T",
+            discipline: "Engineering",
+            projectTitle: "Structure in Sequence"
+          }),
+          createBlankProject(office.id, {
+            name: "Noelle Carter",
+            college: "Washington University in St. Louis",
+            discipline: "Graphics",
+            projectTitle: "Wayfinding in Motion"
+          })
+        ];
+
+        persistState();
+        renderAll();
+        showStatus("Demo content loaded for the selected office.");
+      }
+
+      function clonePagesForExport() {
+        var stage = document.getElementById("export-stage");
+        stage.innerHTML = "";
+        var clones = [];
+        Array.from(document.querySelectorAll(".poster-page")).forEach(function (page) {
+          var clone = page.cloneNode(true);
+          clone.classList.add("poster-page--export");
+          stage.appendChild(clone);
+          clones.push(clone);
+        });
+        return clones;
+      }
+
+      function waitForNextPaint() {
+        return new Promise(function (resolve) {
+          window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(resolve);
+          });
+        });
+      }
+
+      function waitForImages(root) {
+        var images = Array.from(root.querySelectorAll("img"));
+        return Promise.all(
+          images.map(function (image) {
+            if (image.complete && image.naturalWidth > 0) {
+              return Promise.resolve();
+            }
+            return new Promise(function (resolve) {
+              function done() {
+                image.removeEventListener("load", done);
+                image.removeEventListener("error", done);
+                resolve();
+              }
+              image.addEventListener("load", done);
+              image.addEventListener("error", done);
+            });
+          })
+        );
+      }
+
+      function createCanvasesFromPreview() {
+        var clones = clonePagesForExport();
+        return document.fonts.ready.then(function () {
+          return waitForNextPaint();
+        }).then(function () {
+          return Promise.all(clones.map(waitForImages));
+        }).then(function () {
+          return Promise.all(
+            clones.map(function (clone) {
+              return window.html2canvas(clone, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: "#ffffff"
+              });
+            })
+          ).finally(function () {
+            document.getElementById("export-stage").innerHTML = "";
+          });
+        });
+      }
+
+      function exportPdf() {
+        if (!selectedOfficeProjects().length) {
+          showStatus("Add at least one project before exporting.");
+          return;
+        }
+
+        showStatus("Building 11x17 tabloid PDF.");
+        createCanvasesFromPreview()
+          .then(function (canvases) {
+            var jsPDF = window.jspdf.jsPDF;
+            var pageW = 11;  // inches — tabloid portrait
+            var pageH = 17;
+            var pageRatio = pageW / pageH;
+            var pdf = new jsPDF({
+              orientation: "p",
+              unit: "in",
+              format: [pageW, pageH]
+            });
+
+            canvases.forEach(function (canvas, index) {
+              if (index > 0) {
+                pdf.addPage([pageW, pageH], "p");
+              }
+              var canvasRatio = canvas.width / canvas.height;
+              var imgW, imgH, x, y;
+              if (canvasRatio > pageRatio) {
+                // Wider than tabloid — fit to page width, center vertically
+                imgW = pageW;
+                imgH = pageW / canvasRatio;
+                x = 0;
+                y = (pageH - imgH) / 2;
+              } else {
+                // Taller than tabloid — fit to page height, center horizontally
+                imgH = pageH;
+                imgW = pageH * canvasRatio;
+                x = (pageW - imgW) / 2;
+                y = 0;
+              }
+              pdf.addImage(canvas.toDataURL("image/png"), "PNG", x, y, imgW, imgH);
+            });
+
+            var office = getOfficeById(state.selectedOfficeId);
+            pdf.save("ljc-gallery-night-" + slugify(officeDisplayName(office)) + ".pdf");
+            showStatus("PDF exported (11x17 tabloid) for " + officeDisplayName(office) + ".");
+          })
+          .catch(function () {
+            showStatus("The PDF export could not be completed.");
+          });
+      }
+
+      function exportPng() {
+        if (!selectedOfficeProjects().length) {
+          showStatus("Add at least one project before exporting.");
+          return;
+        }
+
+        showStatus("Building PNG export.");
+        createCanvasesFromPreview()
+          .then(function (canvases) {
+            var office = getOfficeById(state.selectedOfficeId);
+            canvases.forEach(function (canvas, index) {
+              canvas.toBlob(function (blob) {
+                var suffix = canvases.length > 1 ? "-page-" + String(index + 1).padStart(2, "0") : "";
+                downloadBlob(blob, "ljc-gallery-night-" + slugify(officeDisplayName(office)) + suffix + ".png");
+              }, "image/png");
+            });
+            showStatus("PNG export complete for " + officeDisplayName(office) + ".");
+          })
+          .catch(function () {
+            showStatus("The PNG export could not be completed.");
+          });
+      }
+
+      refs.officeTabs.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-office-tab]");
+        if (!button) {
+          return;
+        }
+        state.selectedOfficeId = button.dataset.officeTab;
+        persistState();
+        renderAll();
+        showStatus("Switched to " + getOfficeById(state.selectedOfficeId).name + ".");
+      });
+
+      refs.officeDate.addEventListener("input", updateOfficeFields);
+      refs.addProjectBtn.addEventListener("click", addBlankProject);
+      refs.downloadPdfBtn.addEventListener("click", exportPdf);
+      refs.downloadPngBtn.addEventListener("click", exportPng);
+
+      refs.projectList.addEventListener("click", function (event) {
+        var button = event.target.closest("[data-project-action]");
+        if (!button) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        var projectId = button.closest("[data-project-id]").dataset.projectId;
+        var action = button.dataset.projectAction;
+        if (action === "up" || action === "down") {
+          reorderProject(projectId, action);
+          return;
+        }
+        if (action === "delete") {
+          removeProject(projectId);
+        }
+      });
+
+      refs.projectList.addEventListener("input", function (event) {
+        if (event.target.tagName === "SELECT") {
+          return; // selects use the change handler below
+        }
+        var field = event.target.closest("[data-project-field]");
+        if (!field) {
+          return;
+        }
+        var projectId = field.closest("[data-project-id]").dataset.projectId;
+        updateProjectField(projectId, field.dataset.projectField, field.value);
+      });
+
+      refs.projectList.addEventListener("change", function (event) {
+        var internSelect = event.target.closest("select[data-project-field=\"internId\"]");
+        if (internSelect) {
+          var internProjectId = internSelect.closest("[data-project-id]").dataset.projectId;
+          selectInternForProject(internProjectId, internSelect.value);
+          showStatus(internSelect.value ? "Intern selected — name, discipline, college, and headshot updated." : "Intern cleared.");
+          return;
+        }
+
+        var imageInput = event.target.closest("[data-image-input]");
+        if (!imageInput || !imageInput.files || !imageInput.files[0]) {
+          return;
+        }
+
+        var projectId = imageInput.closest("[data-project-id]").dataset.projectId;
+        showStatus("Optimizing image.");
+        optimizeImageFile(imageInput.files[0])
+          .then(function (result) {
+            var project = selectedOfficeProjects().find(function (item) {
+              return item.id === projectId;
+            });
+            if (!project) {
+              return;
+            }
+            project.heroImage = result.dataUrl;
+            project.heroImageName = result.fileName;
+            persistState();
+            renderAll();
+            showStatus("Project image updated.");
+          })
+          .catch(function () {
+            showStatus("That image could not be processed.");
+          });
+      });
+
+      if (window.location.hash.toLowerCase().indexOf("demo") !== -1 && !selectedOfficeProjects().length) {
+        loadDemoContent();
+      } else {
+        renderAll();
+        showStatus("Ready to build the Gallery Night piece.");
+      }
+    })();
+  </script>
+</body>
+</html>
