@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -836,7 +836,7 @@
     .poster-card__media {
       position: relative;
       width: 100%;
-      padding-top: 80%; /* 5:4 aspect via padding hack — html2canvas-safe */
+      padding-top: 80%; /* 5:4 aspect via padding hack â€” html2canvas-safe */
       overflow: hidden;
       background: linear-gradient(180deg, rgba(137, 73, 197, 0.09), rgba(78, 39, 81, 0.03));
       border-bottom: 1px solid rgba(78, 39, 81, 0.08);
@@ -1242,6 +1242,124 @@
         grid-column: 1 / -1;
       }
     }
+
+    /* ================================================== */
+    /* === VAPORWAVE THEME â€” Sunset gradient + grid === */
+    /* ================================================== */
+
+    .poster-page {
+      background:
+        linear-gradient(180deg,
+          #2d1454 0%,
+          #6b2a8c 28%,
+          #d44d8e 55%,
+          #ff7a52 78%,
+          #ffb95e 100%);
+      color: #fff5ec;
+      border: none;
+      border-radius: 12px;
+    }
+
+    .poster-page::before {
+      height: 100%;
+      width: 100%;
+      bottom: 0;
+      top: auto;
+      inset: auto;
+      background:
+        repeating-linear-gradient(180deg, transparent 0 39px, rgba(255, 245, 236, 0.18) 39px 40px),
+        repeating-linear-gradient(90deg, transparent 0 60px, rgba(255, 245, 236, 0.12) 60px 61px);
+      mask: linear-gradient(180deg, transparent 0 50%, #000 70%, #000 100%);
+      -webkit-mask: linear-gradient(180deg, transparent 0 50%, #000 70%, #000 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .poster-page::after { display: none; }
+
+    .poster-header {
+      background: transparent;
+      border: none;
+      padding: 56px 44px 36px;
+      color: #fff5ec;
+      position: relative;
+      z-index: 2;
+    }
+
+    .poster-brand { color: #ffd5e0; letter-spacing: 0.3em; font-weight: 700; }
+    .poster-brand::after { background: #ffd5e0; width: 80px; }
+
+    .poster-pagecount {
+      background: rgba(255, 245, 236, 0.18);
+      color: #fff5ec;
+      border: 1px solid rgba(255, 245, 236, 0.45);
+      letter-spacing: 0.2em;
+      font-weight: 700;
+    }
+
+    .poster-kicker { color: #ffd5e0; letter-spacing: 0.34em; font-weight: 700; font-size: 0.82rem; }
+
+    .poster-title {
+      color: #fff5ec;
+      font-size: clamp(4.5rem, 12vw, 10.5rem);
+      letter-spacing: -0.04em;
+      line-height: 0.84;
+      max-width: none;
+      text-transform: uppercase;
+      text-shadow:
+        4px 4px 0 #6b2a8c,
+        0 0 36px rgba(255, 122, 82, 0.45);
+    }
+
+    .poster-header--compact .poster-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      text-shadow: 2px 2px 0 #6b2a8c;
+    }
+
+    .poster-subtitle { color: rgba(255, 245, 236, 0.82); font-size: 1rem; max-width: 40ch; margin-top: 12px; font-style: italic; }
+
+    .poster-meta-pill {
+      background: rgba(255, 245, 236, 0.95);
+      color: #2d1454;
+      border: 2px solid #2d1454;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+    }
+
+    .project-grid { padding: 28px 44px 48px; gap: 20px; position: relative; z-index: 2; }
+
+    .poster-card {
+      background: rgba(255, 245, 236, 0.96);
+      backdrop-filter: blur(4px);
+      border: 2px solid #2d1454;
+      border-radius: 10px;
+      box-shadow: 0 14px 32px rgba(45, 20, 84, 0.3);
+    }
+
+    .poster-card:nth-child(4n+1) { border-color: #d44d8e; box-shadow: 0 0 0 2px rgba(212, 77, 142, 0.4), 0 14px 32px rgba(45, 20, 84, 0.3); }
+    .poster-card:nth-child(4n+2) { border-color: #ff7a52; box-shadow: 0 0 0 2px rgba(255, 122, 82, 0.4), 0 14px 32px rgba(45, 20, 84, 0.3); }
+    .poster-card:nth-child(4n+3) { border-color: #ffb95e; box-shadow: 0 0 0 2px rgba(255, 185, 94, 0.45), 0 14px 32px rgba(45, 20, 84, 0.3); }
+    .poster-card:nth-child(4n+4) { border-color: #6b2a8c; box-shadow: 0 0 0 2px rgba(107, 42, 140, 0.5), 0 14px 32px rgba(45, 20, 84, 0.3); }
+
+    .poster-card__media { border-bottom: 2px solid #2d1454; }
+    .poster-card.spotlight .poster-card__media { border-right: 2px solid #2d1454; border-bottom: 0; }
+
+    .poster-card__discipline {
+      background: #2d1454;
+      color: #ffd5e0;
+      border-radius: 0;
+      letter-spacing: 0.16em;
+      font-weight: 700;
+    }
+
+    .poster-card__title { color: #2d1454; letter-spacing: -0.02em; text-transform: uppercase; }
+    .poster-card__name { color: #d44d8e; letter-spacing: 0.14em; }
+    .poster-card__college { color: rgba(45, 20, 84, 0.65); }
+
+    .poster-card__avatar { border: 2px solid #2d1454; }
+    .poster-card.spotlight .poster-card__avatar { border-width: 3px; }
+
+    .poster-card__summary { color: rgba(45, 20, 84, 0.78); }
   </style>
 </head>
 <body>
@@ -1261,7 +1379,7 @@
           <p class="section-label">Builder</p>
           <h2 class="section-title">Simple Setup</h2>
           <p class="section-copy">
-            Choose an office, set that office’s date and location, then add the projects that
+            Choose an office, set that officeâ€™s date and location, then add the projects that
             belong on the board. The poster reflows automatically for small and large groups.
           </p>
         </div>
@@ -1343,7 +1461,7 @@
         { id: "st-louis", name: "St. Louis", location: "8640 Evans Ave." }
       ];
 
-      // Intern roster — from the official 2026 LJC program roster plus local assets/Interns folders
+      // Intern roster â€” from the official 2026 LJC program roster plus local assets/Interns folders
       var INTERNS = [
         { id: "joey-friedel", name: "Joey Friedel", officeId: "st-louis", discipline: "Structural Engineering", college: "Missouri S&T", headshot: "assets/Interns/Joey Friedel/headshot.webp" },
         { id: "grant-bailey", name: "Grant Bailey", officeId: "st-louis", discipline: "Mechanical Engineering", college: "Missouri S&T", headshot: "assets/Interns/Grant Bailey/headshot.svg" },
@@ -1661,7 +1779,7 @@
         }
 
         refs.projectList.innerHTML = projects.map(function (project, index) {
-          var summary = [project.name, project.discipline].filter(Boolean).join(" · ");
+          var summary = [project.name, project.discipline].filter(Boolean).join(" Â· ");
           var preview = project.heroImage
             ? "<img src=\"" + project.heroImage + "\" alt=\"" + escapeHtml(project.projectTitle || project.name || "Project hero") + "\" />"
             : "<div class=\"upload-placeholder\">Upload the hero image for this project.</div>";
@@ -1675,9 +1793,9 @@
                   "<p>" + escapeHtml(summary || "Add the intern, discipline, and project details below.") + "</p>" +
                 "</div>" +
                 "<div class=\"summary-actions\">" +
-                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"up\" title=\"Move up\">↑</button>" +
-                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"down\" title=\"Move down\">↓</button>" +
-                  "<button class=\"summary-btn danger\" type=\"button\" data-project-action=\"delete\" title=\"Delete\">×</button>" +
+                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"up\" title=\"Move up\">â†‘</button>" +
+                  "<button class=\"summary-btn\" type=\"button\" data-project-action=\"down\" title=\"Move down\">â†“</button>" +
+                  "<button class=\"summary-btn danger\" type=\"button\" data-project-action=\"delete\" title=\"Delete\">Ã—</button>" +
                 "</div>" +
               "</summary>" +
               "<div class=\"project-editor__body\">" +
@@ -1726,7 +1844,7 @@
       function internDropdownTemplate(project) {
         var officeId = state.selectedOfficeId;
         var roster = internsForOffice(officeId);
-        var options = ["<option value=\"\">Select intern…</option>"];
+        var options = ["<option value=\"\">Select internâ€¦</option>"];
         roster.forEach(function (intern) {
           var selected = project.internId === intern.id ? " selected" : "";
           options.push(
@@ -2100,7 +2218,7 @@
         createCanvasesFromPreview()
           .then(function (canvases) {
             var jsPDF = window.jspdf.jsPDF;
-            var pageW = 11;  // inches — tabloid portrait
+            var pageW = 11;  // inches â€” tabloid portrait
             var pageH = 17;
             var pageRatio = pageW / pageH;
             var pdf = new jsPDF({
@@ -2116,13 +2234,13 @@
               var canvasRatio = canvas.width / canvas.height;
               var imgW, imgH, x, y;
               if (canvasRatio > pageRatio) {
-                // Wider than tabloid — fit to page width, center vertically
+                // Wider than tabloid â€” fit to page width, center vertically
                 imgW = pageW;
                 imgH = pageW / canvasRatio;
                 x = 0;
                 y = (pageH - imgH) / 2;
               } else {
-                // Taller than tabloid — fit to page height, center horizontally
+                // Taller than tabloid â€” fit to page height, center horizontally
                 imgH = pageH;
                 imgW = pageH * canvasRatio;
                 x = (pageW - imgW) / 2;
@@ -2216,7 +2334,7 @@
         if (internSelect) {
           var internProjectId = internSelect.closest("[data-project-id]").dataset.projectId;
           selectInternForProject(internProjectId, internSelect.value);
-          showStatus(internSelect.value ? "Intern selected — name, discipline, college, and headshot updated." : "Intern cleared.");
+          showStatus(internSelect.value ? "Intern selected â€” name, discipline, college, and headshot updated." : "Intern cleared.");
           return;
         }
 
@@ -2256,3 +2374,4 @@
   </script>
 </body>
 </html>
+
