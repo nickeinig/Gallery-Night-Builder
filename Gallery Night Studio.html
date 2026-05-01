@@ -696,6 +696,12 @@
       text-transform: uppercase;
     }
 
+    .poster-pill__label {
+      display: block;
+      line-height: 1;
+      transform: translateY(-0.04em);
+    }
+
     .poster-kicker {
       margin: 0 0 10px;
       font-size: 0.75rem;
@@ -1570,6 +1576,7 @@
   <script>
     (function () {
       var STORAGE_KEY = "ljc-gallery-night-builder-v4";
+      var PUBLISHED_SITE_BASE = "https://nickeinig.github.io/Gallery-Night-Builder/";
       var BRAND_ACCENT = "#4e2751";
       var BRAND_ACCENT_ALT = "#8949c5";
 
@@ -1822,6 +1829,21 @@
         return /^(data:|blob:|https?:)/i.test(String(url || ""));
       }
 
+      function publishedAssetUrl(url) {
+        if (!url || isRemoteOrEmbeddedAsset(url)) {
+          return url;
+        }
+        var normalized = String(url || "").trim().replace(/^["']|["']$/g, "").replace(/^\.?\//, "");
+        if (!normalized || normalized.indexOf("assets/") !== 0) {
+          return url;
+        }
+        try {
+          return new URL(normalized, PUBLISHED_SITE_BASE).href;
+        } catch (error) {
+          return url;
+        }
+      }
+
       function waitForImageUrl(url) {
         return new Promise(function (resolve) {
           if (!url) {
@@ -2053,7 +2075,7 @@
                 "<div class=\"poster-card__placeholder-mark\">LJC</div>" +
                 "<div class=\"poster-card__placeholder-line\" aria-hidden=\"true\"></div>" +
               "</div>" +
-              "<span class=\"poster-card__placeholder-chip\">" + escapeHtml(fallbackTag) + "</span>" +
+              "<span class=\"poster-card__placeholder-chip\"><span class=\"poster-pill__label\">" + escapeHtml(fallbackTag) + "</span></span>" +
             "</div>" +
           "</div>"
         );
@@ -2092,7 +2114,7 @@
             ? "<div class=\"poster-card__avatar\" role=\"img\" aria-label=\"" + escapeHtml((project.name || "Intern") + " headshot") + "\" style=\"background-image: url('" + project.internHeadshot + "')\"></div>"
             : "";
           var disciplineMarkup = project.discipline
-            ? "<span class=\"poster-card__discipline\">" + escapeHtml(project.discipline) + "</span>"
+            ? "<span class=\"poster-card__discipline\"><span class=\"poster-pill__label\">" + escapeHtml(project.discipline) + "</span></span>"
             : "";
           var collegeMarkup = project.college
             ? "<p class=\"poster-card__college\">" + escapeHtml(project.college) + "</p>"
@@ -2134,11 +2156,11 @@
           ? totalProjects + " project" + (totalProjects === 1 ? "" : "s") + " across " + totalPages + " page" + (totalPages === 1 ? "" : "s")
           : "";
         var meta = [
-          "<span class=\"poster-meta-pill\">" + escapeHtml(dateLine) + "</span>"
+          "<span class=\"poster-meta-pill\"><span class=\"poster-pill__label\">" + escapeHtml(dateLine) + "</span></span>"
         ];
 
         var pagecountMarkup = totalPages > 1
-          ? "<span class=\"poster-pagecount\">" + escapeHtml(String(pageIndex + 1).padStart(2, "0") + " / " + String(totalPages).padStart(2, "0")) + "</span>"
+          ? "<span class=\"poster-pagecount\"><span class=\"poster-pill__label\">" + escapeHtml(String(pageIndex + 1).padStart(2, "0") + " / " + String(totalPages).padStart(2, "0")) + "</span></span>"
           : "";
         var subtitleMarkup = subtitle
           ? "<p class=\"poster-subtitle\">" + escapeHtml(subtitle) + "</p>"
@@ -2376,16 +2398,19 @@
         if (window.location.protocol !== "file:") {
           return;
         }
-        Array.from(clone.querySelectorAll(".poster-card__avatar")).forEach(function (avatar) {
-          var url = backgroundImageUrls(avatar.style.backgroundImage)[0];
-          if (!url || isRemoteOrEmbeddedAsset(url)) {
+        Array.from(clone.querySelectorAll("[style*='background-image']")).forEach(function (node) {
+          var backgroundImage = node.style.backgroundImage;
+          var urls = backgroundImageUrls(backgroundImage);
+          if (!urls.length) {
             return;
           }
-          var name = String(avatar.getAttribute("aria-label") || "").replace(/\s+headshot$/i, "").trim();
-          avatar.classList.add("poster-card__avatar--fallback");
-          avatar.style.backgroundImage = "none";
-          avatar.textContent = initialsFromName(name);
-          avatar.setAttribute("aria-label", (name || "Intern") + " initials");
+          urls.forEach(function (url) {
+            var publishedUrl = publishedAssetUrl(url);
+            if (publishedUrl && publishedUrl !== url) {
+              backgroundImage = backgroundImage.replace(url, publishedUrl);
+            }
+          });
+          node.style.backgroundImage = backgroundImage;
         });
       }
 
