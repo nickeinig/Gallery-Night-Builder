@@ -1306,7 +1306,8 @@
     .poster-header {
       background: transparent;
       border: none;
-      padding: 56px 44px 36px;
+      padding: 56px 44px 42px;
+      gap: 22px;
       color: #fff5ec;
       position: relative;
       z-index: 2;
@@ -1323,15 +1324,16 @@
       font-weight: 700;
     }
 
-    .poster-kicker { color: #ffd5e0; letter-spacing: 0.34em; font-weight: 700; font-size: 0.82rem; }
+    .poster-kicker { color: #ffd5e0; letter-spacing: 0.34em; font-weight: 700; font-size: 0.82rem; margin-bottom: 14px; }
 
     .poster-title {
       color: #fff5ec;
       font-size: clamp(4.5rem, 12vw, 10.5rem);
       letter-spacing: -0.04em;
-      line-height: 0.84;
+      line-height: 0.9;
       max-width: none;
       text-transform: uppercase;
+      margin-bottom: 10px;
       text-shadow:
         4px 4px 0 #6b2a8c,
         0 0 36px rgba(255, 122, 82, 0.45);
@@ -1339,10 +1341,18 @@
 
     .poster-header--compact .poster-title {
       font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 0.92;
+      margin-bottom: 0;
       text-shadow: 2px 2px 0 #6b2a8c;
     }
 
     .poster-subtitle { color: rgba(255, 245, 236, 0.82); font-size: 1rem; max-width: 40ch; margin-top: 12px; font-style: italic; }
+
+    .poster-meta-row {
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
 
     .poster-meta-pill {
       background: rgba(255, 245, 236, 0.95);
